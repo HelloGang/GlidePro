@@ -42,7 +42,7 @@ public abstract class WebpDownSampler extends Downsampler {
      * Load and scale the image uniformly (maintaining the image's aspect ratio) so that the smallest edge of the
      * image will be between 1x and 2x the requested size. The larger edge has no maximum size.
      */
-    public static final Downsampler AT_LEAST = new Downsampler() {
+    public static final Downsampler AT_LEAST = new WebpDownSampler() {
         @Override
         protected int getSampleSize(int inWidth, int inHeight, int outWidth, int outHeight) {
             return Math.min(inHeight / outHeight, inWidth / outWidth);
@@ -58,7 +58,7 @@ public abstract class WebpDownSampler extends Downsampler {
      * Load and scale the image uniformly (maintaining the image's aspect ratio) so that largest edge of the image
      * will be between 1/2x and 1x of the requested size. The smaller edge has no minimum size.
      */
-    public static final Downsampler AT_MOST = new Downsampler() {
+    public static final Downsampler AT_MOST = new WebpDownSampler() {
         @Override
         protected int getSampleSize(int inWidth, int inHeight, int outWidth, int outHeight) {
             int maxIntegerFactor = (int) Math.ceil(Math.max(inHeight / (float) outHeight,
@@ -76,7 +76,7 @@ public abstract class WebpDownSampler extends Downsampler {
     /**
      * Load the image at its original size.
      */
-    public static final Downsampler NONE = new Downsampler() {
+    public static final Downsampler NONE = new WebpDownSampler() {
         @Override
         protected int getSampleSize(int inWidth, int inHeight, int outWidth, int outHeight) {
             return 0;
@@ -321,18 +321,19 @@ public abstract class WebpDownSampler extends Downsampler {
         //注释原本
         //final Bitmap result = BitmapFactory.decodeStream(is, null, options);
         Bitmap result = null;
-        try {
-            if (WebpUtils.isWebp(is)) {
-                //Webp
-                byte[] s = WebpUtils.streamToBytes(is);
-                result = BitmapFactory.decodeByteArray(s, 0, s.length, options);
-            } else {
-                //非Webp采用原有的策略
+
+        if (WebpUtils.isWebp(is)) {
+            //Webp
+            byte[] s = WebpUtils.streamToBytes(is);
+            result = WebpUtils.byteToBitmap(s);//BitmapFactory.decodeByteArray(s, 0, s.length, options);
+        } else {
+            try { //非Webp采用原有的策略
                 result = BitmapFactory.decodeStream(is, null, options);
+            } catch (OutOfMemoryError error) {
+                error.printStackTrace();
             }
-        } catch (OutOfMemoryError error) {
-            error.printStackTrace();
         }
+
 
         try {
             if (options.inJustDecodeBounds) {
