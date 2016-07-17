@@ -29,8 +29,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void initData(){
-        Glide.with(this).load("http://p2.pstatp.com/list/300x196/abf0000dafb4f0b0c6c.webp").into(mIvLogo);
-        //mExGlide.getBuilder("http://p2.pstatp.com/list/300x196/abf0000dafb4f0b0c6c.webp").into(mIvLogo);
+        mExGlide.getBuilder("http://p2.pstatp.com/list/300x196/abf0000dafb4f0b0c6c.webp").into(mIvLogo);
     }
 
 }
