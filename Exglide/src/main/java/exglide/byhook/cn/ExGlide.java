@@ -22,12 +22,25 @@ import java.io.InputStream;
  */
 public class ExGlide {
 
+    public static ExGlide mExGlide;
+
     private StreamBitmapDecoder mDecoder;
 
     private Context mContext;
 
-    public ExGlide(Context ctx){
+    private ExGlide(Context ctx) {
         mContext = ctx;
+    }
+
+    public static void init(Context ctx){
+        mExGlide = new ExGlide(ctx);
+    }
+
+    public static ExGlide get(){
+        if(mExGlide==null){
+            throw new IllegalStateException("ExGlide is need to be init");
+        }
+        return mExGlide;
     }
 
     public GenericRequestBuilder getBuilder(String url) {
